@@ -33,6 +33,7 @@ st.title("Bitcoin options strategy calculator")
 
 # Define the strategies dictionary
 strategies = {
+    'Short Call': {'sentiment': 'Bear', 'volatility': 'High'},
     'Bull Put Spread': {'sentiment': 'Bull', 'volatility': 'High'},
     'Short Put': {'sentiment': 'Bull', 'volatility': 'High'},
     'Put Broken Wing Butterfly': {'sentiment': 'Bull', 'volatility': 'High'},
@@ -46,7 +47,6 @@ strategies = {
     'Short Iron Condor': {'sentiment': 'Neutral', 'volatility': 'High'},
     'Short Iron Butterfly': {'sentiment': 'Neutral', 'volatility': 'High'},
     'Bear Call Spread': {'sentiment': 'Bear', 'volatility': 'High'},
-    'Short Call': {'sentiment': 'Bear', 'volatility': 'High'},
     'Call Broken Wing Butterfly': {'sentiment': 'Bear', 'volatility': 'High'},
     'Custom Naked Call': {'sentiment': 'Bear', 'volatility': 'High'},
     'Bear Put Spread': {'sentiment': 'Bear', 'volatility': 'Low'},
