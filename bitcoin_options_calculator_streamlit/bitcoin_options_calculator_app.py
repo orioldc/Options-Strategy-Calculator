@@ -270,17 +270,10 @@ def last_friday_of_month(any_day):
     last_day_datetime = datetime(any_day.year, any_day.month, last_day)
     # Calculate the difference between the last day of the month and the desired weekday (Friday)
     difference = last_day_datetime.weekday() - calendar.FRIDAY
-    # If the difference is positive, the last Friday is before the last day of the month
-    if difference > 0:
-        # Subtract the difference from the last day to find the last Friday
-        return last_day_datetime - timedelta(days=difference)
-    # If the difference is negative, the last Friday is in the previous month
-    elif difference < 0:
-        # Add the (negative) difference to the last day to find the last Friday
-        return last_day_datetime + timedelta(days=-difference)
-    # If the difference is zero, the last day of the month is a Friday
-    else:
-        return last_day_datetime
+    # Adjust the difference to find the last Friday
+    difference = difference + 7 if difference < 0 else difference
+    # Subtract the difference from the last day to find the last Friday
+    return last_day_datetime - timedelta(days=difference)
 
 # Get today's date
 today = datetime.now()
@@ -288,8 +281,12 @@ today = datetime.now()
 # Get the last Friday of the current month
 last_friday = last_friday_of_month(today)
 
+# User input for the expiry date with default value as the last Friday of the month
+expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
+
+
 # User input for the strategy   
-strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys()))
+strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys(), value="Short Call"))
 
 # User input for the expiry date
 expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
@@ -300,7 +297,7 @@ days_to_expiry = (expiry_date - date.today()).days
 expiry_date2 = np.nan
 days_to_expiry2 = None
 if 'Calendar' in strategy or 'Diagonal' in strategy:
-    expiry_date2_input = st.date_input('Enter the second expiry date for calendar/diagonal spreads:', value=datetime.now() + timedelta(days=60))
+    expiry_date2_input = st.date_input('Enter the second expiry date for calendar/diagonal spreads:', value=last_friday)
     expiry_date2 = expiry_date2_input
     days_to_expiry2 = (expiry_date2 - date.today()).days
 
