@@ -59,6 +59,9 @@ strategies = {
 #Define the strategy mapping dictionary
 
 strategy_mapping = {
+    "Short Call":
+        [{"leg":1, "direction":"Short", "type":"Call", "size":1, "description":""}],
+    
     "Bear Put Spread":
         [{"leg":1, "direction":"Long", "type":"Put", "size":1, "description":"Buy 1 ITM Put; Sell 1 OTM Put at Lower Strike Price. The combination of options should result in a net debit."},
         {"leg":2, "direction":"Short", "type":"Put", "size":1, "description":""}],
@@ -68,9 +71,6 @@ strategy_mapping = {
 
     "Long Put":
         [{"leg":1, "direction":"Long", "type":"Put", "size":1, "description":""}],
-
-    "Short Call":
-        [{"leg":1, "direction":"Short", "type":"Call", "size":1, "description":""}],
 
     "Short Put":
         [{"leg":1, "direction":"Short", "type":"Put", "size":1, "description":""}],
@@ -280,10 +280,6 @@ today = datetime.now()
 
 # Get the last Friday of the current month
 last_friday = last_friday_of_month(today)
-
-# User input for the expiry date with default value as the last Friday of the month
-expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
-
 
 # User input for the strategy   
 strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys()))
