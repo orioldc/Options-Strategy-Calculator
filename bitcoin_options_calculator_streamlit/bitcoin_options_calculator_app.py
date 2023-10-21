@@ -14,6 +14,7 @@ import plotly.io as pio
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import requests
+import calendar
 
 # define custom CSS
 
@@ -259,12 +260,39 @@ risk_free_rate = risk_free_rate[0]
 #  ASK FOR USER INPUT TO START CALCULATION
 #####
 
+# create function to calculate last Friday of current month
+# it will be used to default the value in the expiry date
+
+def last_friday_of_month(any_day):
+    # Find the last day of the month
+    _, last_day = calendar.monthrange(any_day.year, any_day.month)
+    # Create a datetime object for the last day of the month
+    last_day_datetime = datetime(any_day.year, any_day.month, last_day)
+    # Calculate the difference between the last day of the month and the desired weekday (Friday)
+    difference = last_day_datetime.weekday() - calendar.FRIDAY
+    # If the difference is positive, the last Friday is before the last day of the month
+    if difference > 0:
+        # Subtract the difference from the last day to find the last Friday
+        return last_day_datetime - timedelta(days=difference)
+    # If the difference is negative, the last Friday is in the previous month
+    elif difference < 0:
+        # Add the (negative) difference to the last day to find the last Friday
+        return last_day_datetime + timedelta(days=-difference)
+    # If the difference is zero, the last day of the month is a Friday
+    else:
+        return last_day_datetime
+
+# Get today's date
+today = datetime.now()
+
+# Get the last Friday of the current month
+last_friday = last_friday_of_month(today)
 
 # User input for the strategy   
 strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys()))
 
 # User input for the expiry date
-expiry_date_input = st.date_input('Enter the expiry date:', value=datetime.now() + timedelta(days=30))
+expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
 expiry_date = expiry_date_input
 days_to_expiry = (expiry_date - date.today()).days
 
