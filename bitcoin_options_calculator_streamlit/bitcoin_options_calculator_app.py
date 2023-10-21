@@ -286,7 +286,7 @@ expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
 
 
 # User input for the strategy   
-strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys(), value="Short Call"))
+strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys()))
 
 # User input for the expiry date
 expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
