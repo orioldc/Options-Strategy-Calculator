@@ -26,7 +26,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title of the app
-st.title("Bitcoin option strategy calculator")
+st.title("Bitcoin options strategy calculator")
 
 # DEFINE KEY DICTIONARIES FOR MAPPING 
 
