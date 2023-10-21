@@ -260,7 +260,7 @@ risk_free_rate = risk_free_rate[0]
 #####
 
 
-# User input for the strategy
+# User input for the strategy   
 strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys()))
 
 # User input for the expiry date
@@ -1072,190 +1072,184 @@ if st.button('Produce P&L chart'):
     ### DISPLAY THE PLOTLY CHART IN STREAMLIT 
     #########
 
-    # Create columns for layout
-    left_column, center_column, right_column = st.columns([1,6,1])
+    # Create a line plot
+    fig = go.Figure()
 
-    # Use the center column to display the Plotly chart
-    with center_column:
+    # Add line plot
+    fig.add_trace(go.Scatter(x=pl_table['price_range'], y=pl_table['profit'], mode='lines', showlegend=False))
 
-        import datetime as dt
+    # Add horizontal line
+    fig.add_trace(go.Scatter(x=pl_table['price_range'], y=np.zeros(len(pl_table['price_range'])), mode='lines', line=dict(color="black"), showlegend=False))
 
-        # Create a file name
-        yesterday = dt.date.today() - dt.timedelta(days=1)
-        filename = '{}{}{}_improved_annotations_UI_prices.html'.format(tickerSymbol, strategy, yesterday)
+    # Add filled area plot for profit >= 0
+    fig.add_trace(go.Scatter(
+        x=pl_table['price_range'], 
+        y=np.where(pl_table['profit'] >= 0, pl_table['profit'], 0), 
+        fill='tozeroy', 
+        fillcolor='rgba(0,200,0,0.2)',
+        line_color='rgba(255,255,255,0)',
+        showlegend=False,
+    ))
 
-        # Create a line plot
-        fig = go.Figure()
+    # Add filled area plot for profit < 0
+    fig.add_trace(go.Scatter(
+        x=pl_table['price_range'], 
+        y=np.where(pl_table['profit'] < 0, pl_table['profit'], 0), 
+        fill='tozeroy', 
+        fillcolor='rgba(200,0,0,0.2)',
+        line_color='rgba(255,255,255,0)',
+        showlegend=False,
+    ))
 
-        # Add line plot
-        fig.add_trace(go.Scatter(x=pl_table['price_range'], y=pl_table['profit'], mode='lines', showlegend=False))
-
-        # Add horizontal line
-        fig.add_trace(go.Scatter(x=pl_table['price_range'], y=np.zeros(len(pl_table['price_range'])), mode='lines', line=dict(color="black"), showlegend=False))
-
-        # Add filled area plot for profit >= 0
-        fig.add_trace(go.Scatter(
-            x=pl_table['price_range'], 
-            y=np.where(pl_table['profit'] >= 0, pl_table['profit'], 0), 
-            fill='tozeroy', 
-            fillcolor='rgba(0,200,0,0.2)',
-            line_color='rgba(255,255,255,0)',
-            showlegend=False,
-        ))
-
-        # Add filled area plot for profit < 0
-        fig.add_trace(go.Scatter(
-            x=pl_table['price_range'], 
-            y=np.where(pl_table['profit'] < 0, pl_table['profit'], 0), 
-            fill='tozeroy', 
-            fillcolor='rgba(200,0,0,0.2)',
-            line_color='rgba(255,255,255,0)',
-            showlegend=False,
-        ))
-
-        # Set title, labels and layout options
-        fig.update_layout(
-            title={
-                'text': f"P/L Chart for {tickerSymbol} {strategy}",
-                'y':0.9,
-                'x':0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'},
-            title_font_size=20,
-            autosize=False,
-            width=1040, # Increased width
-            height=780, # Increased height
-            margin=dict(
-                l=50,
-                r=50,
-                b=100,
-                t=100,
-                pad=4
-            ),
-            xaxis_title="Price Range",
-            yaxis_title="Profit",
-            showlegend=False, # Hide the legend
-            font=dict(
-                family="Arial",
-                size=18,
-                color="RebeccaPurple"
-            )
+    # Set title, labels and layout options
+    fig.update_layout(
+        title={
+            'text': f"P/L Chart for {tickerSymbol} {strategy}",
+            'y':0.9,
+            'x':0.55,
+            'xanchor': 'center',
+            'yanchor': 'top'},
+        title_font_size=20,
+        autosize=False,
+        width=1000, # Increased width
+        height=750, # Increased height
+        margin=dict(
+            l=1,
+            r=1,
+            b=100,
+            t=100,
+            pad=1
+        ),
+        xaxis_title="Price Range",
+        yaxis_title="Profit",
+        showlegend=False, # Hide the legend
+        font=dict(
+            family="Arial",
+            size=18,
+            color="RebeccaPurple"
         )
+    )
 
-        # Join the instrument_names list into a single string
-        instrument_names_str = ', '.join(instrument_names)
+    # Join the instrument_names list into a single string
+    instrument_names_str = ', '.join(instrument_names)
 
-        # Set a subtitle
+    # Set a subtitle
+    fig.add_annotation(
+        xref="paper",
+        yref="paper",
+        x=0.5,
+        y=1.0,
+        text=f"Instrument Names: {instrument_names_str}",  # Displayed instrument names
+        showarrow=False,
+        font=dict(size=14)
+    )
+
+    # Format variables
+    #max_loss_at_expiration = format(max_loss_at_expiration, '.2f')
+    #max_profit_at_expiration = format(max_profit_at_expiration, '.2f')
+    #break_even_price_point_1 = format(break_even_price_point_1, '.2f')
+
+    # Annotations
+    fig.add_annotation(
+        xref="paper",
+        yref="paper",
+        x=0.5,
+        y=-0.19,
+        text=f"Maximum loss at expiration: {format(max_loss_at_expiration, '.2f')}", 
+        showarrow=False,
+        font=dict(size=14)
+    )
+
+    fig.add_annotation(
+        xref="paper",
+        yref="paper",
+        x=0.5,
+        y=0.28,
+        text=f"Maximum profit at expiration: {format(max_profit_at_expiration, '.2f')}", 
+        showarrow=False,
+        font=dict(size=14)
+    )
+
+    # check if break_even_price_point_1 is a str
+
+    # check if break_even_price_point_1 is a string and if it is, skip the code
+    if type(break_even_price_point_1) is not str:
+
         fig.add_annotation(
             xref="paper",
             yref="paper",
             x=0.5,
-            y=1.0,
-            text=f"Instrument Names: {instrument_names_str}",  # Displayed instrument names
+            y=0.22,
+            text=f"Break-even price point 1: {format(break_even_price_point_1, '.2f')}", 
             showarrow=False,
             font=dict(size=14)
         )
 
-        # Format variables
-        #max_loss_at_expiration = format(max_loss_at_expiration, '.2f')
-        #max_profit_at_expiration = format(max_profit_at_expiration, '.2f')
-        #break_even_price_point_1 = format(break_even_price_point_1, '.2f')
+    # check if break_even_price_point_1 is a string and if it is, skip the code
+    if type(break_even_price_point_1) is not str:
 
-        # Annotations
-        fig.add_annotation(
-            xref="paper",
-            yref="paper",
-            x=0.5,
-            y=-0.19,
-            text=f"Maximum loss at expiration: {format(max_loss_at_expiration, '.2f')}", 
-            showarrow=False,
-            font=dict(size=14)
-        )
-
-        fig.add_annotation(
-            xref="paper",
-            yref="paper",
-            x=0.5,
-            y=0.28,
-            text=f"Maximum profit at expiration: {format(max_profit_at_expiration, '.2f')}", 
-            showarrow=False,
-            font=dict(size=14)
-        )
-
-        # check if break_even_price_point_1 is a str
-
-        # check if break_even_price_point_1 is a string and if it is, skip the code
-        if type(break_even_price_point_1) is not str:
-
+        # Check if break_even_price_point_2 is defined
+        try:
+            if isinstance(break_even_price_point_2, str):
+                break_even_price_point_2 = float(break_even_price_point_2)
+            break_even_price_point_2_str = format(break_even_price_point_2, '.2f')
+            
             fig.add_annotation(
                 xref="paper",
                 yref="paper",
                 x=0.5,
-                y=0.22,
-                text=f"Break-even price point 1: {format(break_even_price_point_1, '.2f')}", 
+                y=0.19,
+                text=f"Break-even price point 2: {break_even_price_point_2_str}", 
                 showarrow=False,
                 font=dict(size=14)
             )
+        except NameError:
+            pass
 
-        # check if break_even_price_point_1 is a string and if it is, skip the code
-        if type(break_even_price_point_1) is not str:
+    # check if break_even_price_point_1 is a string and if it is, skip the code
+    if type(break_even_price_point_1) is not str:
+        
+        try:
 
-            # Check if break_even_price_point_2 is defined
-            try:
-                if isinstance(break_even_price_point_2, str):
-                    break_even_price_point_2 = float(break_even_price_point_2)
-                break_even_price_point_2_str = format(break_even_price_point_2, '.2f')
-                
-                fig.add_annotation(
-                    xref="paper",
-                    yref="paper",
-                    x=0.5,
-                    y=0.19,
-                    text=f"Break-even price point 2: {break_even_price_point_2_str}", 
-                    showarrow=False,
-                    font=dict(size=14)
-                )
-            except NameError:
-                pass
+            # add expected return
+            fig.add_annotation(
+                xref="paper",
+                yref="paper",
+                x=0.5,
+                y=0.25,
+                text=f"Expected return: {format(expected_return, '.2f')}", 
+                showarrow=False,
+                font=dict(size=14)
+            )
+        except NameError:
+            pass
 
-        # check if break_even_price_point_1 is a string and if it is, skip the code
-        if type(break_even_price_point_1) is not str:
-            
-            try:
+    # check if break_even_price_point_1 is a string and if it is, skip the code
+    if type(break_even_price_point_1) is not str:
 
-                # add expected return
-                fig.add_annotation(
-                    xref="paper",
-                    yref="paper",
-                    x=0.5,
-                    y=0.25,
-                    text=f"Expected return: {format(expected_return, '.2f')}", 
-                    showarrow=False,
-                    font=dict(size=14)
-                )
-            except NameError:
-                pass
+        try:
 
-        # check if break_even_price_point_1 is a string and if it is, skip the code
-        if type(break_even_price_point_1) is not str:
+            # add probability of price being in the profit zone at expiry
+            fig.add_annotation(
+                xref="paper",
+                yref="paper",
+                x=0.5,
+                y=0.16,
+                text=f"Probability of price being in the profit zone at expiry: {format(probability_profit_zone*100, '.1f')}", 
+                showarrow=False,
+                font=dict(size=14)
+            )
+        
+        except NameError:
+            pass
+    
+    # Create columns for layout
+    col1, col2, col3 = st.columns([0.2,12,0.2])
 
-            try:
+    # Display chart in the center column
+    with col2:
 
-                # add probability of price being in the profit zone at expiry
-                fig.add_annotation(
-                    xref="paper",
-                    yref="paper",
-                    x=0.5,
-                    y=0.16,
-                    text=f"Probability of price being in the profit zone at expiry: {format(probability_profit_zone*100, '.1f')}", 
-                    showarrow=False,
-                    font=dict(size=14)
-                )
-            
-            except NameError:
-                pass
-
-        st.plotly_chart(fig)
+        st.plotly_chart(fig,use_container_width=True)
 
 #####
 # FOOTER NOTES
