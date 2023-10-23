@@ -29,6 +29,36 @@ st.markdown("""
 # Title of the app
 st.title("Bitcoin options strategy calculator")
 
+####
+# CREATE AN ABOUT SECTION
+####
+
+# Add an expander to the sidebar with a label of 'About'
+about_expander = st.sidebar.expander(label='About', expanded=True)  # expanded=False will start with the section collapsed
+
+# Use the expander to add content to the sidebar
+with about_expander:
+    st.markdown(
+        """
+        ## Bitcoin Options Calculator
+        
+        This app allows you to calculate the expected returns for various Bitcoin options strategies. 
+        You can select a strategy, specify your parameters, and see a visualization 
+        of potential profits and losses.
+        
+        The profit & loss chart will display:
+            - The maximum profit at expiration: this is the maximum amount you can expect to gain from the strategy
+            - The expected return: the amount you can expect to earn based on the probability of the price being in the profit zone
+            - Break-even price point/s: the price/s from which the trade will be in profit 
+            - The probability of price being in the profit zone at expiration
+
+        The app uses historical bitcoin data from Yahoo finance and Deribit exchange to estimate probabilities and returns, 
+        giving you a better understanding of the risk and reward involved in each strategy. The option prices used for the calculations 
+        are taken from the latest transactions seen on Deribit exchange for a specific instrument.
+        """
+    )
+
+
 # DEFINE KEY DICTIONARIES FOR MAPPING 
 
 # Define the strategies dictionary
@@ -59,21 +89,21 @@ strategies = {
 #Define the strategy mapping dictionary
 
 strategy_mapping = {
-    "Short Call":
-        [{"leg":1, "direction":"Short", "type":"Call", "size":1, "description":""}],
-    
     "Bear Put Spread":
         [{"leg":1, "direction":"Long", "type":"Put", "size":1, "description":"Buy 1 ITM Put; Sell 1 OTM Put at Lower Strike Price. The combination of options should result in a net debit."},
         {"leg":2, "direction":"Short", "type":"Put", "size":1, "description":""}],
 
     "Long Call":
-        [{"leg":1, "direction":"Long", "type":"Call", "size":1, "description":""}],
+        [{"leg":1, "direction":"Long", "type":"Call", "size":1, "description":"Buy 1 Call option"}],
 
     "Long Put":
-        [{"leg":1, "direction":"Long", "type":"Put", "size":1, "description":""}],
+        [{"leg":1, "direction":"Long", "type":"Put", "size":1, "description":"Buy 1 Put option"}],
+
+    "Short Call":
+        [{"leg":1, "direction":"Short", "type":"Call", "size":1, "description":"Sell 1 Call option"}],
 
     "Short Put":
-        [{"leg":1, "direction":"Short", "type":"Put", "size":1, "description":""}],
+        [{"leg":1, "direction":"Short", "type":"Put", "size":1, "description":"Sell 1 Put Option"}],
 
     "Bull Call Spread":
         [{"leg":1, "direction":"Long", "type":"Call", "size":1, "description":"Buy 1 ITM Call; Sell 1 OTM Call at Higher Strike Price. The combination of options should result in a net debit."},
@@ -283,6 +313,12 @@ last_friday = last_friday_of_month(today)
 
 # User input for the strategy   
 strategy = st.selectbox('Enter your chosen strategy:', list(strategies.keys()))
+
+# Get the description from strategy_mapping
+strategy_description = strategy_mapping[strategy][0]['description']
+
+# Display the description
+st.markdown(f"<div style='white-space: normal; width:100%;'>{strategy_description}</div>", unsafe_allow_html=True)
 
 # User input for the expiry date
 expiry_date_input = st.date_input('Enter the expiry date:', value=last_friday)
@@ -1287,7 +1323,7 @@ footer = """
         }
     </style>
     <div class="footer">
-        <p>Built by <a href="https://twitter.com/orioldc" target="_blank">orioldc</a></p>
+        <p>Built by <a href="https://orioldc.com" target="_blank">orioldc</a></p>
     </div>
 """
 
