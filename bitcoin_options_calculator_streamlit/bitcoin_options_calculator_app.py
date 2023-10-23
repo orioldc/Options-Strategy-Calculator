@@ -55,6 +55,11 @@ with about_expander:
         The app uses historical bitcoin data from Yahoo finance and Deribit exchange to estimate probabilities and returns, 
         giving you a better understanding of the risk and reward involved in each strategy. The option prices used for the calculations 
         are taken from the latest transactions seen on Deribit exchange for a specific instrument.
+
+        Important notice: this app will run into errors if you enter parameters for which an instrument in Deribit can't be found. For example,
+        trying to find a contract with a strike price of $29,876 will result into an error because Deribit only transacts option contracts rounded
+        to the nearest 1000. Likewise, entering dates for which there's no contracts expiring will result in an error. Moreover, for strategies that 
+        have multiple legs, you're required to enter the strike prices for all legs. Failing to do so will also result in an error. 
         """
     )
 
